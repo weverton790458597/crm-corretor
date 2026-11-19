@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CRM Corretor">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>CRM Corretor — Gestão Imobiliária</title>
+<link rel="stylesheet" href="styles.css?v=8">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="auth">
+<div class="card au">
+<div class="brand"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></i>CRM Corretor</div>
+<p class="mu">Seus leads, visitas, propostas e comissões em um só lugar.</p>
+<form id="lf" onsubmit="login(event)">
+<label>E-mail<input class="in" type="email" id="le" autocomplete="username" required></label>
+<label>Senha<input class="in" type="password" id="lp" autocomplete="current-password" required></label>
+<button class="btn w">Entrar</button>
+<p class="mu">Novo por aqui? <a href="#" onclick="tab(1);return false">Criar conta</a></p>
+</form>
+<form id="rf" onsubmit="register(event)" style="display:none">
+<label>E-mail<input class="in" type="email" id="re" autocomplete="username" required></label>
+<label>Senha<input class="in" type="password" id="rp" minlength="6" autocomplete="new-password" required></label>
+<button class="btn w">Criar conta</button>
+<p class="mu">Já tem conta? <a href="#" onclick="tab(0);return false">Entrar</a></p>
+</form>
+</div>
+</div>
+<div id="app" style="display:none">
+<aside>
+<div class="brand"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></i>CRM Corretor</div>
+<a class="btn gold w" href="imoveis/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg>Ir para Imóveis</a>
+<nav id="nav"></nav>
+<button class="out" onclick="logout()">Sair</button>
+</aside>
+<main>
+<header>
+<h1 id="ttl"></h1>
+<div class="hb">
+<button class="btn g sm" onclick="gs()" aria-label="Buscar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="t">Buscar</span></button>
+<a class="btn gold sm" href="imoveis/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg><span class="t">Imóveis</span></a>
+</div>
+</header>
+<section id="view"></section>
+</main>
+</div>
+<nav id="tb" class="tabbar"></nav>
+<div id="sh" class="sheet" onclick="sheet(0)"></div>
+<div id="dr" class="dr" onclick="dc()"></div>
+<div id="ts"></div>
+<div id="md" class="md" onclick="if(event.target===this)cm()"></div>
+<script src="app.js?v=7"></script>
+</body>
+</html>

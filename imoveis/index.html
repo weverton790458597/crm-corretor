@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar de Lançamentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceff4;--panel:#fff;--ink:#0f1b33;--ink2:#5b6680;--line:#dde2ec;--blue:#2650f5;--soft:#eef1fb;--brass:#c98a0a;--brass-s:#fdf1d6;--r:16px;--sh:0 1px 2px rgba(15,27,51,.06),0 12px 28px -14px rgba(15,27,51,.22)}
+@media (prefers-color-scheme:dark){:root{--bg:#0a111f;--panel:#111a2e;--ink:#eef1f8;--ink2:#93a0bb;--line:#1f2a44;--blue:#6f8cff;--soft:#17213b;--brass:#f0b73a;--brass-s:#2b2410;--sh:0 12px 28px -14px rgba(0,0,0,.6)}}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:grid;grid-template-columns:268px minmax(0,1fr)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+aside{background:#0c1630;color:#e9edf7;padding:26px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:22px}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}
+.logo{width:40px;height:40px;border-radius:12px;background:conic-gradient(from 210deg,#2650f5,#6f8cff,#c98a0a,#2650f5);display:grid;place-items:center;flex:none}
+.logo::after{content:"";width:14px;height:14px;border-radius:50%;background:#0c1630;border:3px solid #fff}
+.brand b{font-family:'Instrument Serif',serif;font-size:1.6rem;font-weight:400;line-height:1}
+.brand small{display:block;font-size:.72rem;color:#8f9bb8;margin-top:3px}
+.st{font-size:.76rem;color:#8f9bb8;padding:0 10px 8px;font-weight:700}
+.builders{display:flex;flex-direction:column;gap:2px}
+.bi{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:11px;background:none;border:0;cursor:pointer;color:#cdd5e8;font-size:.87rem;font-weight:600;width:100%;text-align:left}
+.bi:hover{background:rgba(255,255,255,.06)}.bi.on{background:rgba(111,140,255,.24);color:#fff}
+.bi .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bi .ct{font-size:.74rem;color:#8f9bb8;font-weight:700}
+.bi .nw{background:var(--brass);color:#1d1400;font-size:.68rem;font-weight:800;padding:2px 7px;border-radius:99px}
+.foot{margin-top:auto;font-size:.76rem;color:#8f9bb8;padding:0 10px;line-height:1.5}
+.av{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:.72rem;color:#fff;flex:none}
+main{padding:30px clamp(16px,3vw,40px) 60px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+h1{font-family:'Instrument Serif',serif;font-weight:400;font-size:clamp(2rem,4vw,2.9rem);line-height:1.05}
+.sub{color:var(--ink2);margin-top:8px;font-size:.9rem;display:flex;align-items:center;gap:8px}
+.live{width:8px;height:8px;border-radius:50%;background:#14a874;animation:p 2.4s infinite}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(20,168,116,.6)}80%,100%{box-shadow:0 0 0 9px transparent}}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{background:var(--panel);border:1px solid var(--line);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.85rem;cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--blue);color:var(--blue)}.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}.btn.p:hover{color:#fff;filter:brightness(1.1)}
+.kpis{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:14px;margin-bottom:22px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;display:flex;align-items:center;gap:14px;min-width:0}
+.kpi .ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:var(--soft);color:var(--blue);flex:none}
+.kpi .ic svg{width:22px;height:22px}
+.kpi b{font-family:'Instrument Serif',serif;font-size:2.4rem;font-weight:400;display:block;line-height:1}
+.kpi span{font-size:.8rem;color:var(--ink2)}
+.kpi.hot{background:linear-gradient(135deg,#1e3a9f,#2650f5 60%,#5a7bff);border:0;color:#fff;box-shadow:var(--sh)}
+.kpi.hot .ic{background:rgba(255,255,255,.18);color:#fff}.kpi.hot span{color:#dbe3ff}.kpi.hot b{font-size:3rem}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.search{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 14px;outline:none;font-size:.9rem}
+.search:focus{border-color:var(--blue)}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px}
+.seg button{border:0;background:none;padding:7px 14px;border-radius:9px;font-size:.84rem;font-weight:700;color:var(--ink2);cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--soft);color:var(--blue)}
+.count{font-size:.84rem;color:var(--ink2);margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:18px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;min-width:0}
+.cover{--h:220;position:relative;width:100%;border:0;display:block;text-align:left;cursor:pointer;color:#fff;padding:14px 16px 16px;min-height:150px;background:linear-gradient(135deg,hsl(var(--h) 58% 40%),hsl(calc(var(--h) + 30) 62% 24%))}
+.cover::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 1px,transparent 1px 22px);-webkit-mask-image:linear-gradient(160deg,#000,transparent 75%);mask-image:linear-gradient(160deg,#000,transparent 75%)}
+.cover::after{content:"";position:absolute;right:-26px;bottom:-34px;width:130px;height:130px;border:22px solid rgba(255,255,255,.1);border-radius:50%}
+.cover>*{position:relative;z-index:1}
+.cover:hover{filter:brightness(1.06)}
+.ctop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.tag{display:inline-flex;align-items:center;gap:7px;font-size:.74rem;font-weight:800;padding:4px 11px 4px 5px;border-radius:99px;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);max-width:100%}
+.tag i{width:18px;height:18px;border-radius:50%;background:#fff;color:#0c1630;display:grid;place-items:center;font-style:normal;font-size:.6rem;flex:none}
+.tag span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:99px;background:#ffc94d;color:#2b1d00}
+.cover h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:1.65rem;line-height:1.12;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-right:34px}
+.chev{position:absolute!important;right:14px;bottom:16px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;transition:transform .2s}
+.card.open .chev{transform:rotate(180deg)}
+.stats{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;font-size:.78rem;color:var(--ink2);font-weight:600}
+.stats span{display:inline-flex;align-items:center;gap:6px;background:var(--soft);padding:5px 10px;border-radius:99px}
+.stats svg{width:13px;height:13px}
+.files{display:none;border-top:1px solid var(--line);padding:8px 10px 12px}
+.card.open .files{display:block}
+.list{max-height:320px;overflow-y:auto;padding-right:2px}
+.f{display:flex;align-items:center;gap:11px;padding:8px;border-radius:10px;font-size:.85rem;min-width:0}
+.f:hover{background:var(--soft)}
+.ext{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:.62rem;font-weight:800;color:#fff;flex:none;background:#6b7690}
+.fi{flex:1;min-width:0}
+.fi a{display:block;color:var(--ink);text-decoration:none;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi a:hover{color:var(--blue)}
+.fi small{color:var(--ink2);font-size:.72rem}
+.n{font-size:.66rem;font-weight:800;color:var(--brass);background:var(--brass-s);padding:2px 8px;border-radius:99px;flex:none}
+.mini{border:1px solid var(--line);background:none;border-radius:8px;padding:4px 9px;font-size:.72rem;font-weight:700;color:var(--ink2);cursor:pointer;flex:none}
+.mini:hover{color:var(--blue);border-color:var(--blue)}
+.acts{display:flex;gap:8px;padding:10px 6px 0;flex-wrap:wrap}
+.go{flex:1;min-width:150px;text-align:center;text-decoration:none;background:var(--blue);color:#fff;font-weight:800;font-size:.84rem;padding:11px;border-radius:11px}
+.go:hover{filter:brightness(1.1)}
+.more{display:block;margin:26px auto 0}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink2);background:var(--panel);border:1px dashed var(--line);border-radius:var(--r)}
+.empty b{display:block;color:var(--ink);margin-bottom:6px;font-size:1.05rem}
+.sk{height:200px;border-radius:var(--r);background:linear-gradient(90deg,var(--panel) 25%,var(--line) 50%,var(--panel) 75%);background-size:200% 100%;animation:s 1.3s infinite}
+@keyframes s{to{background-position:-200% 0}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#0c1630;color:#fff;padding:12px 18px;border-radius:12px;font-size:.86rem;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:30}
+.toast.show{opacity:1;transform:translate(-50%,0)}.toast.err{background:#b4233c}
+@media (max-width:1100px){.kpis{grid-template-columns:1fr 1fr}.kpi.hot{grid-column:1/-1}}
+@media (max-width:900px){body{grid-template-columns:minmax(0,1fr)}aside{position:static;height:auto;padding:16px 14px;gap:12px}.builders{flex-direction:row;overflow-x:auto;padding-bottom:4px}.bi{width:auto;flex:none}.st,.foot{display:none}}
+@media (max-width:520px){.kpis{grid-template-columns:1fr}.btns{width:100%}.btns .btn{flex:1}.seg{width:100%}.seg button{flex:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="brand"><div class="logo"></div><div><b>Radar</b><small>Lançamentos imobiliários</small></div></div>
+  <div><div class="st">Construtoras</div><nav class="builders" id="builders"></nav></div>
+  <div class="foot" id="foot"></div>
+</aside>
+<main>
+  <div class="top">
+    <div><h1>Radar de Lançamentos</h1><p class="sub"><span class="live"></span><span id="sub">Carregando…</span></p></div>
+    <div class="btns"><button class="btn" onclick="marcarTodos()">Marcar tudo como visto</button><button class="btn p" onclick="carregar(true)">Atualizar</button></div>
+  </div>
+  <section class="kpis">
+    <div class="kpi hot"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg></div><div><b id="k-n">0</b><span>arquivos novos</span></div></div>
+    <div class="kpi"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg></div><div><b id="k-e">0</b><span>empreendimentos</span></div></div>
+    <div class="kpi"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></div><div><b id="k-a">0</b><span>arquivos no total</span></div></div>
+    <div class="kpi"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M10 21v-4h4v4"/></svg></div><div><b id="k-c">0</b><span>construtoras</span></div></div>
+  </section>
+  <section class="bar">
+    <input class="search" id="q" type="search" placeholder="Buscar empreendimento, construtora ou arquivo" aria-label="Buscar">
+    <div class="seg" id="seg"><button data-s="" class="on">Todos</button><button data-s="novo">Com novidade</button></div>
+  </section>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+  <button class="btn more" id="more" hidden>Mostrar mais</button>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const URL_ = "https://qrhdpvuugcrphrqcowra.supabase.co/rest/v1/lancamentos_drive";
+const KEY = "sb_publishable_cNTmUbq_Xz7MV4Xars1cnQ_St6iawiO";
+const H = { apikey: KEY, Authorization: `Bearer ${KEY}` };
+const SOLTOS = "Arquivos soltos", PASSO = 24;
+const S = { itens: [], q: "", so: "", c: "", abertos: new Set(), lim: PASSO };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const safe = u => /^https?:\/\//i.test(u) ? u : "#";
+const ini = n => n.trim().split(/\s+/).slice(0,2).map(p => p[0]).join("").toUpperCase();
+const hue = n => { let h = 0; for (const c of n) h = (h*31 + c.charCodeAt(0)) % 360; return h; };
+const cor = n => `hsl(${hue(n)} 52% 42%)`;
+const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const ehPasta = i => (i.tipo || "").toLowerCase().includes("pasta");
+const IC_V = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>';
+const IC_F = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/></svg>';
+const IC_T = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+const EXTS = { pdf:"#e5484d", doc:"#2650f5", docx:"#2650f5", xls:"#1f9d6b", xlsx:"#1f9d6b", csv:"#1f9d6b", jpg:"#a855f7", jpeg:"#a855f7", png:"#a855f7", zip:"#d98a0a", rar:"#d98a0a", mp4:"#0ea5b7", dwg:"#6b7690" };
+const extDe = t => { const m = String(t).match(/\.([a-z0-9]{2,4})$/i); return m ? m[1].toLowerCase() : "arq"; };
+
+function rel(iso) {
+  if (!iso) return "recente";
+  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (m < 60) return `há ${Math.max(m,1)} min`;
+  const h = Math.round(m/60); if (h < 24) return `há ${h} h`;
+  const d = Math.round(h/24); return d < 30 ? `há ${d} ${d === 1 ? "dia" : "dias"}` : new Date(iso).toLocaleDateString("pt-BR");
+}
+function toast(m, err) { const t = $("toast"); t.textContent = m; t.className = "toast show" + (err ? " err" : ""); clearTimeout(toast.t); toast.t = setTimeout(() => t.className = "toast", 2600); }
+
+function grupos() {
+  const mapa = new Map();
+  for (const i of S.itens) {
+    const emp = i.empreendimento || (ehPasta(i) ? i.titulo : SOLTOS);
+    const k = `${i.construtora}||${emp}`;
+    if (!mapa.has(k)) mapa.set(k, { construtora: i.construtora, emp, itens: [], pasta: null, ultimo: 0 });
+    const g = mapa.get(k);
+    g.itens.push(i);
+    g.pasta ??= i.pasta_url || (ehPasta(i) ? i.drive_url : null);
+    g.ultimo = Math.max(g.ultimo, new Date(i.detectado_em || 0).getTime());
+  }
+  return [...mapa.values()].map(g => {
+    g.arquivos = g.itens.filter(i => !ehPasta(i)).sort((a, b) => new Date(b.detectado_em) - new Date(a.detectado_em));
+    g.novos = g.itens.filter(i => i.status === "novo").length;
+    return g;
+  });
+}
+
+async function carregar(manual) {
+  try {
+    const r = await fetch(`${URL_}?select=*&order=detectado_em.desc&limit=5000`, { headers: H });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    S.itens = await r.json();
+    render(); if (manual) toast("Dados atualizados");
+  } catch (e) {
+    $("grid").innerHTML = `<div class="empty"><b>Não foi possível carregar</b>${esc(e.message)}. Verifique a conexão e atualize.</div>`;
+  }
+}
+async function patch(filtro) {
+  const r = await fetch(`${URL_}?${filtro}`, { method: "PATCH", headers: { ...H, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify({ status: "visto" }) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+}
+async function marcar(ids) {
+  try {
+    await patch(`id=in.(${ids.map(encodeURIComponent).join(",")})`);
+    const set = new Set(ids.map(String));
+    S.itens.forEach(i => { if (set.has(String(i.id))) i.status = "visto"; });
+    render();
+  } catch (e) { toast("Erro: " + e.message, true); }
+}
+async function marcarTodos() {
+  const n = S.itens.filter(i => i.status === "novo").length;
+  if (!n) return toast("Nada novo para marcar");
+  if (!confirm(`Marcar ${n} itens como vistos?`)) return;
+  try { await patch("status=eq.novo"); S.itens.forEach(i => i.status = "visto"); render(); toast("Tudo marcado como visto"); }
+  catch (e) { toast("Erro: " + e.message, true); }
+}
+
+function render() {
+  const g = grupos();
+  $("k-n").textContent = S.itens.filter(i => i.status === "novo" && !ehPasta(i)).length;
+  $("k-e").textContent = g.filter(x => x.emp !== SOLTOS).length;
+  $("k-a").textContent = S.itens.filter(i => !ehPasta(i)).length;
+  $("k-c").textContent = new Set(S.itens.map(i => i.construtora)).size;
+  const u = S.itens[0]?.detectado_em;
+  $("sub").textContent = u ? `Última varredura ${rel(u)}` : "Sem varreduras ainda";
+  $("foot").textContent = "Atualiza sozinho a cada 5 minutos.";
+
+  const cs = {};
+  g.forEach(x => { const c = cs[x.construtora] ??= { e: 0, n: 0 }; c.e++; c.n += x.novos; });
+  const nomes = Object.keys(cs).sort((a, b) => cs[b].n - cs[a].n || a.localeCompare(b));
+  const bi = (id, label, ct, nw) => `<button class="bi ${S.c === id ? "on" : ""}" data-c="${esc(id)}"><span class="av" style="background:${id ? cor(id) : "#2650f5"}">${id ? esc(ini(id)) : "★"}</span><span class="nm">${esc(label)}</span>${nw ? `<span class="nw">${nw}</span>` : `<span class="ct">${ct}</span>`}</button>`;
+  $("builders").innerHTML = bi("", "Todas", g.length, g.reduce((s, x) => s + x.novos, 0)) + nomes.map(n => bi(n, n, cs[n].e, cs[n].n)).join("");
+
+  const t = norm(S.q);
+  const lista = g.filter(x =>
+    (!S.c || x.construtora === S.c) && (!S.so || x.novos) &&
+    (!t || norm(x.emp).includes(t) || norm(x.construtora).includes(t) || x.arquivos.some(a => norm(a.titulo).includes(t)))
+  ).sort((a, b) => (b.novos > 0) - (a.novos > 0) || b.ultimo - a.ultimo);
+
+  $("count").textContent = `${lista.length} ${lista.length === 1 ? "empreendimento" : "empreendimentos"}`;
+  $("more").hidden = lista.length <= S.lim;
+  if (!lista.length) { $("grid").innerHTML = '<div class="empty"><b>Nada por aqui</b>Nenhum empreendimento corresponde aos filtros. Limpe a busca ou troque a construtora.</div>'; return; }
+
+  $("grid").innerHTML = lista.slice(0, S.lim).map(x => {
+    const k = `${x.construtora}||${x.emp}`, aberto = S.abertos.has(k);
+    const ids = x.itens.filter(i => i.status === "novo").map(i => i.id);
+    const arq = x.arquivos.length;
+    return `<article class="card ${aberto ? "open" : ""}">
+      <button class="cover" style="--h:${hue(x.construtora)}" data-k="${esc(k)}" aria-expanded="${aberto}">
+        <div class="ctop"><span class="tag"><i>${esc(ini(x.construtora))}</i><span>${esc(x.construtora)}</span></span>${x.novos ? `<span class="pill">${x.novos} ${x.novos === 1 ? "novo" : "novos"}</span>` : ""}</div>
+        <h2>${esc(x.emp)}</h2><span class="chev">${IC_V}</span>
+      </button>
+      <div class="stats"><span>${IC_F}${arq} ${arq === 1 ? "arquivo" : "arquivos"}</span>${x.ultimo ? `<span>${IC_T}${rel(new Date(x.ultimo).toISOString())}</span>` : ""}</div>
+      <div class="files">
+        <div class="list">${arq ? x.arquivos.map(a => { const e = extDe(a.titulo); return `<div class="f"><span class="ext" style="background:${EXTS[e] || "#6b7690"}">${esc(e.toUpperCase().slice(0,3))}</span><div class="fi"><a href="${esc(safe(a.drive_url))}" target="_blank" rel="noopener noreferrer" title="${esc(a.titulo)}">${esc(a.titulo)}</a><small>${rel(a.detectado_em)}</small></div>${a.status === "novo" ? `<span class="n">NOVO</span><button class="mini" data-v="${esc(a.id)}">Visto</button>` : ""}</div>`; }).join("") : '<div class="f" style="color:var(--ink2)">Pasta ainda sem arquivos.</div>'}</div>
+        <div class="acts">
+          ${x.pasta ? `<a class="go" href="${esc(safe(x.pasta))}" target="_blank" rel="noopener noreferrer">Abrir pasta no Drive</a>` : ""}
+          ${ids.length ? `<button class="btn" data-all="${ids.map(esc).join(",")}">Marcar tudo visto</button>` : ""}
+        </div>
+      </div></article>`;
+  }).join("");
+}
+
+$("grid").addEventListener("click", e => {
+  const v = e.target.closest("[data-v]"); if (v) return marcar([v.dataset.v]);
+  const a = e.target.closest("[data-all]"); if (a) return marcar(a.dataset.all.split(","));
+  const h = e.target.closest(".cover"); if (!h) return;
+  const k = h.dataset.k; S.abertos.has(k) ? S.abertos.delete(k) : S.abertos.add(k);
+  h.closest(".card").classList.toggle("open"); h.setAttribute("aria-expanded", S.abertos.has(k));
+});
+const reset = () => { S.lim = PASSO; render(); };
+$("builders").addEventListener("click", e => { const b = e.target.closest(".bi"); if (b) { S.c = b.dataset.c; reset(); } });
+$("seg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.so = b.dataset.s; $("seg").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); reset(); });
+$("q").addEventListener("input", e => { S.q = e.target.value; reset(); });
+$("more").addEventListener("click", () => { S.lim += PASSO; render(); });
+carregar(); setInterval(() => carregar(), 300000);
+</script>
+</body>
+</html>
